@@ -39,9 +39,6 @@ public class RegistrationResponse{
         String token = userService.signUpUser(
            modelMapper.map(registrationRequest, User.class)
         );
-
-
-
         link=link+token;
         //for email verification
         emailSender.send(

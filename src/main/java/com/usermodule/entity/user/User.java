@@ -53,6 +53,14 @@ public class User {
     private String state;
     private String city;
 
+    public User(@Email(message = "please enter valid email") @NotNull(message = "Email can't be null") String email, @NotNull(message = "Password can't be null") String password, @NotNull(message = "FirstName cant't be null") String firstName, @NotNull(message = "LastName cant't be null") String lastName, Gender gender) {
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+    }
+
     public User(@Email(message = "please enter valid email") @NotNull(message = "Email can't be null") String email, @NotNull(message = "Password can't be null") String password, @NotNull(message = "FirstName cant't be null") String firstName, @NotNull(message = "LastName cant't be null") String lastName, Gender gender, Title title, Role role, String number, boolean isEmailVerified, String fileName, String country, String state, String city) {
         this.email = email;
         this.password = password;

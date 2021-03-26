@@ -28,7 +28,7 @@
 //        return org.springframework.security.core.userdetails.User//
 //        .withUsername(username)//
 //        .password(user.get().getPassword())//
-//        .authorities(user.get().getRole())//
+//        .authorities(grantedAuthorities)//
 //        .accountExpired(false)//
 //        .accountLocked(false)//
 //        .credentialsExpired(false)//

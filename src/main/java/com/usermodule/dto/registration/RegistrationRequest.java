@@ -21,4 +21,12 @@ public class RegistrationRequest {
     private String country;
     private String state;
     private String city;
+
+    public RegistrationRequest(String email, String password, String firstName, String lastName, Gender gender) {
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+    }
 }

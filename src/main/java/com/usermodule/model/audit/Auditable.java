@@ -29,7 +29,7 @@ public abstract class Auditable<U> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     @Setter
-    private Double id;
+    private Long id;
 /*
     @CreatedBy
     @Getter

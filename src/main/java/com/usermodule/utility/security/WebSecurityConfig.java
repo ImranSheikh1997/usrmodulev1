@@ -59,22 +59,25 @@
 //        //Entry Points (Allowing Requests)
 //        http.authorizeRequests()
 //                .antMatchers("/*").permitAll()
-//                .antMatchers("/usermodule/registration/**").permitAll()
-//                .antMatchers("/usermodule/signin/**").permitAll()
-//                .antMatchers("/usermodule/registration/confirm/**").permitAll()
-//                .antMatchers("registration/country/**").permitAll()
-//                .antMatchers("registration/state/**").permitAll()
-//                .antMatchers("registration/city/**").permitAll()
-//                .antMatchers("/v2/api-docs").permitAll()
-//                .antMatchers("/swagger-resources/**").permitAll()
-//                .antMatchers("/swagger-ui.html").permitAll()
-//                .antMatchers("/configuration/**").permitAll()
-//                .antMatchers("/webjars/**").permitAll()
-//                .antMatchers("/public").permitAll()
+//                .antMatchers("/","/usermodule","/registration","/**").permitAll()
+//                .antMatchers("/","/usermodule","/signin","/",**").permitAll()
+//                .antMatchers("/","/usermodule","/registration","/confirm/**").permitAll()
+//                .antMatchers("/","/registration","/country","/**").permitAll()
+//                .antMatchers("/","/registration","/state","/**").permitAll()
+//                .antMatchers("/","/registration","/city","/**").permitAll()
+//                .antMatchers("/","/v2,"/api-docs").permitAll()
+//                .antMatchers("/","/swagger-resources/**").permitAll()
+//                .antMatchers("/","/swagger-ui.html").permitAll()
+//                .antMatchers("/","/configuration/**").permitAll()
+//                .antMatchers("/","/webjars/**").permitAll()
+//                .antMatchers("/","/public").permitAll()
 //                //Disallow everything else...
 //                .anyRequest().authenticated();
 //
-//        //No Session Will be Created or  used by Spring Security
+//            http.formlogin()
+//                .loginPage("/signin")
+//                .permitAll()
+////        //No Session Will be Created or  used by Spring Security
 //    //    http.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().
 //
 //                http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -86,6 +89,7 @@
 ////        http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
 //
 //        //if you want to test api from browser
+
 //
 //   //      http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 //

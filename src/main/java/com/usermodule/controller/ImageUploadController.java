@@ -1,11 +1,14 @@
 package com.usermodule.controller;
 
 import com.usermodule.dto.UploadFileResponse;
+import com.usermodule.dto.image.ImageRequest;
+import com.usermodule.dto.login.LogInResponse;
 import com.usermodule.service.FileStorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +26,12 @@ public class ImageUploadController {
     @Autowired
     private FileStorageService fileStorageService;
 
+    @Autowired
+    private LogInResponse logInResponse;
+
     //This API is for Uploading A file.
-    @PostMapping("registration/uploadFile")
-    public UploadFileResponse uploadFile(
+    @PostMapping("/registration/uploadFile/multipart")
+    public ResponseEntity<?> uploadFile(
             @RequestParam("file") MultipartFile file
     )
     {
@@ -36,11 +42,22 @@ public class ImageUploadController {
                 .path(filename)
                 .toUriString();
 
-        return new UploadFileResponse(filename, fileDownloadUri, file.getContentType(), file.getSize());
+        return new ResponseEntity<>(new UploadFileResponse(filename, fileDownloadUri, file.getContentType(), file.getSize()),HttpStatus.OK);
+      //  return new ResponseEntity<>(filename, HttpStatus.OK);
+    }
+
+    @PostMapping("/registration/uploadfile/base64")
+    public ResponseEntity<?> uploadBase64File(
+            //@RequestBody ImageRequest imageRequest
+            @RequestParam("avatar") String BASE64){
+
+        String filename = logInResponse.convertToMultipart(BASE64);
+        //String filename = fileStorageService.storeFile(imageRequest);
+        return new ResponseEntity<>(filename,HttpStatus.ACCEPTED);
     }
 
     //This Api is for Downloading file
-    @GetMapping("/downloadFile/{fileName:.+}")
+    @GetMapping("/multipart/downloadFile/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(
             @PathVariable String fileName,
             HttpServletRequest request){
