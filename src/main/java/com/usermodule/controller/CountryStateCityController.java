@@ -10,10 +10,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -44,11 +41,11 @@ public class CountryStateCityController {
 
 
     //This api will return list of City According to State
-    @GetMapping(value= "registration/city")
+    @GetMapping(value= "registration/city/{stateId}")
     public ResponseEntity<?> findCities(
             @Valid
             @StateId
-            @RequestParam Long stateId
+            @PathVariable Long stateId
     ){
         return new ResponseEntity<>(cityService.getCitiesByState(stateId),HttpStatus.OK);
     }
@@ -56,11 +53,11 @@ public class CountryStateCityController {
 
 
     //This api will return list of State According to State
-    @GetMapping(value= "registration/state")
+    @GetMapping(value= "registration/state/{countryId}")
     public ResponseEntity<?> findStates(
             @Valid
             @StateId
-            @RequestParam Long countryId
+            @PathVariable Long countryId
     ){
         return new ResponseEntity<>(stateService.getStatesByCountry(countryId),HttpStatus.OK);
     }

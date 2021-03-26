@@ -1,10 +1,12 @@
 package com.usermodule.dto.login;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
 @AllArgsConstructor
 @Getter
+@Setter
+@ToString
+@NoArgsConstructor
 public class LogInRequest {
     String email;
     String password;

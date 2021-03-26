@@ -1,5 +1,6 @@
 package com.usermodule.controller;
 
+import com.usermodule.dto.login.LogInRequest;
 import com.usermodule.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
-@RequestMapping("/usermodule")
+//@RequestMapping("/usermodule")
 @CrossOrigin("*")
 public class LoginController {
 
@@ -22,18 +23,19 @@ public class LoginController {
     private UserService userService;
 
     //This Api is for  Signing form
-    @GetMapping(path="/signin")
+
     @ApiOperation(value = "${UserController.signin}")
     @ApiResponses(value = {
             @ApiResponse(code = 400,message = "Something Went Wrong"), //
             @ApiResponse(code = 422,message = "Invalid username/password supplied")
     }
     )
-    public ResponseEntity<?> login(//
-                                  @RequestParam("email") String email, //
-                                   @RequestParam("password") String password) {
+    @PostMapping("/signin")
+    public ResponseEntity<?> login(
+            @RequestBody LogInRequest logInRequest) {
        //String token = userService.signin(email,password);
-        return new ResponseEntity<>(HttpStatus.OK, HttpStatus.ACCEPTED);
+
+        return new ResponseEntity<>(logInRequest.getEmail(), HttpStatus.ACCEPTED);
     }
 
 }

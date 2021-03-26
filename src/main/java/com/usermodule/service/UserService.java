@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -65,6 +66,10 @@ public class UserService {
         confirmationTokenService.saveConfirmationToken(confirmationToken);
         return token;
     }
+
+    public void facebookSignUp(User user){
+        //TODO: if saving user to database then everytime hitting sign in with will give email already exists error
+    }
     //for enabling user based on email
     public void enableUser(String email) {
         userRepository.enableUser(email);
@@ -85,5 +90,13 @@ public class UserService {
 
     public void delete(String email) {
         userRepository.deleteByEmail(email);
+    }
+
+    public Iterable<User> findAllUser() {
+        return userRepository.findAll();
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
