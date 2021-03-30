@@ -1,17 +1,15 @@
 package com.usermodule.service;
 
-import com.usermodule.entity.token.ConfirmationToken;
 import com.usermodule.entity.user.User;
 import com.usermodule.repository.UserRepository;
 import com.usermodule.utility.exception.CustomException;
-//import com.usermodule.utility.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
+
+//import com.usermodule.utility.security.JwtTokenProvider;
 
 @Service
 public class UserService {
@@ -20,9 +18,6 @@ public class UserService {
             "user with email %s not found";
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private ConfirmationTokenService confirmationTokenService;
 
 //    @Autowired
 //    private AuthenticationManager authenticationManager;
@@ -33,12 +28,13 @@ public class UserService {
 //    @Autowired
 //    private PasswordEncoder passwordEncoder;
 
-    public String signUpUser(User user){
+    public void signUpUser(User user){
 
         //to check is user is present or not (return type boolean)
-        boolean userExists = userRepository.findByEmail(user.getEmail()).isPresent();
 
-        if(userExists){
+        Optional<User> userExists = userRepository.findByEmail(user.getEmail());
+
+        if(userExists.isPresent()){
             //TODO Check attributes(firstname,lastname etc are same
             //TODO and if email not confirmed then confirmation email.
 
@@ -48,28 +44,23 @@ public class UserService {
   //      user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         userRepository.save(user);
-
-        return emailOrMobileVerification(user);
     }
 
-    public String emailOrMobileVerification(User user){
-        //Generating random number for Email verification token and Sms Verification
-        String token = UUID.randomUUID().toString();
+    public void checkEmail(String email)
+    {
+        Optional<User> userExists = userRepository.findByEmail(email);
 
-        ConfirmationToken confirmationToken = new ConfirmationToken(
-                token,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusMinutes(15),
-                user
-        );
+        if(userExists.isPresent()){
+            //TODO Check attributes(firstname,lastname etc are same
+            //TODO and if email not confirmed then confirmation email.
 
-        confirmationTokenService.saveConfirmationToken(confirmationToken);
-        return token;
+            throw new CustomException("Email already taken", HttpStatus.BAD_REQUEST);
+        }
     }
-
     public void facebookSignUp(User user){
         //TODO: if saving user to database then everytime hitting sign in with will give email already exists error
     }
+
     //for enabling user based on email
     public void enableUser(String email) {
         userRepository.enableUser(email);

@@ -10,7 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ImageRequest {
-    String name;
-    String type;
+
     String avatar;
 }

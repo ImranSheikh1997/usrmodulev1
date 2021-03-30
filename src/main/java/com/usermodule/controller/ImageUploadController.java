@@ -48,10 +48,11 @@ public class ImageUploadController {
 
     @PostMapping("/registration/uploadfile/base64")
     public ResponseEntity<?> uploadBase64File(
-            //@RequestBody ImageRequest imageRequest
-            @RequestParam("avatar") String BASE64){
+            @RequestBody ImageRequest imageRequest
+           // @RequestParam("avatar") String BASE64
+    ){
 
-        String filename = logInResponse.convertToMultipart(BASE64);
+        String filename = logInResponse.convertToMultipart(imageRequest);
         //String filename = fileStorageService.storeFile(imageRequest);
         return new ResponseEntity<>(filename,HttpStatus.ACCEPTED);
     }

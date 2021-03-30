@@ -3,12 +3,14 @@ package com.usermodule.dto.registration;
 import com.usermodule.model.enums.Gender;
 import com.usermodule.model.enums.Title;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-@EqualsAndHashCode
+//@EqualsAndHashCode
+@NoArgsConstructor
+
 public class RegistrationRequest {
     private String email;
     private String password;

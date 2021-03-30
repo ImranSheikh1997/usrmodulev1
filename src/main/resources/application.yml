@@ -4,11 +4,14 @@ server:
     include-binding-errors: always
 
 spring:
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
   datasource:
     password: GlobalVox@1243#
     url: jdbc:mysql://localhost:3306/usermodule1
     username: root
-
+    driver-class-name: com.mysql.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: none
@@ -17,6 +20,12 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
     show-sql: true
+    open-in-view: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
 
   mail:
     host: smtp.gmail.com
@@ -40,6 +49,7 @@ spring:
           class: javax.net.ssl.SSLSocketFactory
           port: 465
           fallback: false
+
   #Multipart Properties(Properties for file upload)
   servlet:
     multipart:
