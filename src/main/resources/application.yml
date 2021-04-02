@@ -14,7 +14,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
@@ -27,11 +27,12 @@ spring:
     baseline-on-migrate: true
 
 
+
   mail:
     host: smtp.gmail.com
     port: 587
     username: is463856@gmail.com
-    password: Imran@GlobalVox
+    password: pzmyohwilottzqhb
 
     properties:
       mail:
@@ -50,7 +51,7 @@ spring:
           port: 465
           fallback: false
 
-  #Multipart Properties(Properties for file upload)
+    #Multipart Properties(Properties for file upload)
   servlet:
     multipart:
       enabled: true

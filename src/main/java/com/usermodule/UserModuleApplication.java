@@ -1,6 +1,6 @@
 package com.usermodule;
 
-import com.usermodule.config.property.FileStorageProperties;
+import com.usermodule.fileutil.config.property.FileStorageProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
