@@ -28,6 +28,15 @@ public class ConfirmationTokenController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
+    //This Api is used for send Email verification link
+    @GetMapping("/sendotp/{number}")
+    public ResponseEntity<?> verifyByMobileNumber(
+            @PathVariable("number") String number
+    ){
+        verificationResponse.mobileVerification(number);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
     //This Api is for confirming api and enabling user
     @ApiOperation(value = "${UserController.confirm.token}")
     @GetMapping(path ="/login/confirm/{token}")
