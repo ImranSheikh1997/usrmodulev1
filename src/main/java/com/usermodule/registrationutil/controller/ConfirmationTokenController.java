@@ -48,4 +48,5 @@ public class ConfirmationTokenController {
 
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
 }

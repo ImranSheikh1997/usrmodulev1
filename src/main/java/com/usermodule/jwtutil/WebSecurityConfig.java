@@ -16,13 +16,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -30,8 +28,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     MyUserDetails myUserDetails;
 
-    @Autowired
-    private JwtTokenFilter jwtTokenFilter;
+//    @Autowired
+//    private JwtTokenFilter jwtTokenFilter;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -53,7 +51,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //Disable CSRF(Cross Site Request Forgery)
         http.csrf().disable();
         http.cors().disable();
-
+        http.headers().frameOptions().sameOrigin().and().authorizeRequests();
         //Entry Points (Allowing Requests)
         http.authorizeRequests()
                 .antMatchers("/","/usermodule","/registration","/**").permitAll()
@@ -69,6 +67,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/","/configuration/**").permitAll()
                 .antMatchers("/","/webjars/**").permitAll()
                 .antMatchers("/","/public").permitAll()
+                .antMatchers("/topic","/greetings").permitAll()
+                .antMatchers("/hello").permitAll()
+                .antMatchers("/websocket","/blog","/**","/**","/websocket").permitAll()
                 //Disallow everything else...
                 .anyRequest().authenticated();
 
@@ -85,14 +86,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.exceptionHandling().accessDeniedPage("/login");
 
 //        //Apply JWT
-        http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
+        //http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
 
         //if you want to test api from browser
 
-
-         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
-        //   http.httpBasic();
+         //http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
@@ -108,6 +106,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("usermodule/login")
                 .antMatchers("usermodule/signin")
                 .antMatchers("usermodule/registration/confirm")
+                .antMatchers("/topic","/greetings")
+                .antMatchers("/hello")
+                .antMatchers("/websocket/","**")
+                .antMatchers("/websocket","/blog","/**","/**","/websocket")
                 .and()
                 .ignoring();
     }

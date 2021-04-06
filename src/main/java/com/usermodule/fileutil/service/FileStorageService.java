@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Iterator;
 
 
 @Service
@@ -58,6 +59,7 @@ public class FileStorageService {
             checkInvalidCharacters(fileName);
             //copy file to the target location(Replacing filename with the same name)
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
+
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
             return fileName;
@@ -73,4 +75,20 @@ public class FileStorageService {
         }
     }
 
+    public Path loadFileAsPath(String fileName) {
+        Path imagePath=null;
+        Path rootLocation = Paths.get(fileName);
+        try{
+            if(rootLocation.toFile().exists()){
+                Iterator<Path> iterator = Files.newDirectoryStream(rootLocation).iterator();
+                if(iterator.hasNext()){
+                    imagePath = iterator.next();
+                }
+            }
+        }
+        catch (IOException ie){
+            throw new CustomException("Can't retrieve image",HttpStatus.BAD_REQUEST);
+        }
+        return imagePath;
+    }
 }

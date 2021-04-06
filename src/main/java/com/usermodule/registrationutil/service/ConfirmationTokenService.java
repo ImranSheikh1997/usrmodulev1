@@ -38,4 +38,8 @@ public class ConfirmationTokenService {
         confirmationTokenRepository.save(confirmationToken);
         return token;
     }
+
+    public String findConfirmationTokenByUser(User user) {
+        return findConfirmationTokenByUser(user);
+    }
 }

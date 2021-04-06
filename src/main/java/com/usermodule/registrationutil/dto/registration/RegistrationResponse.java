@@ -3,6 +3,7 @@ package com.usermodule.registrationutil.dto.registration;
 import com.usermodule.registrationutil.dto.VerificationResponse;
 import com.usermodule.registrationutil.entity.user.User;
 import com.usermodule.registrationutil.model.enums.Role;
+import com.usermodule.registrationutil.repository.ConfirmationTokenRepository;
 import com.usermodule.registrationutil.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -22,6 +23,9 @@ public class RegistrationResponse {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private VerificationResponse verificationResponse;
+
+    @Autowired
+    private ConfirmationTokenRepository confirmationTokenRepository;
 
     //for saving user to the db.
     public void register(RegistrationRequest registrationRequest) {
@@ -48,4 +52,5 @@ public class RegistrationResponse {
                 )
         );
     }
+
 }

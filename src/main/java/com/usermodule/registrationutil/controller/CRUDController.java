@@ -2,15 +2,18 @@ package com.usermodule.registrationutil.controller;
 
 import com.usermodule.registrationutil.dto.UpdateRequest;
 import com.usermodule.registrationutil.dto.registration.RegistrationRequest;
-import com.usermodule.registrationutil.entity.user.User;
+import com.usermodule.registrationutil.service.DisplayFindAllUserRequest;
+import com.usermodule.registrationutil.service.DisplayUserService;
 import com.usermodule.registrationutil.service.UserService;
 import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Slf4j
 public class CRUDController {
 
     @Autowired
@@ -19,8 +22,11 @@ public class CRUDController {
     @Autowired
     private UpdateRequest updateRequest;
 
+    @Autowired
+    private DisplayUserService displayUserService;
+
     //This Api will Delete User From DB Based on Email.
-    @DeleteMapping(value="/{username}")
+    @DeleteMapping(value="/deleteuser/{email}")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     @ApiOperation(value = "${UserController.delete}", authorizations = { @Authorization(value="apiKey")})
     @ApiResponses(value ={//
@@ -40,7 +46,8 @@ public class CRUDController {
     @GetMapping("/findalluser")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> findAllUser(){
-        Iterable<User> userList=userService.findAllUser();
+        Iterable<DisplayFindAllUserRequest> userList = displayUserService.get_All_UserProfile();
+
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
@@ -49,7 +56,7 @@ public class CRUDController {
     public ResponseEntity<?> findUser(
             @PathVariable String email
     ){
-        return new ResponseEntity<>(userService.findByEmail(email),HttpStatus.OK);
+        return new ResponseEntity<>(displayUserService.get_UserProfile(email),HttpStatus.OK);
     }
 
     @PutMapping("/updateuser/{email}")

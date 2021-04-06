@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -63,8 +64,11 @@ public class UserService {
     public String signin(String email, String password) {
         try
         {
+            Optional<User> user = userRepository.findByEmail(email);
+            if(!user.isPresent()) {
+                throw new CustomException("Invalid username supplied", HttpStatus.UNAUTHORIZED);
+            }
            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-             Optional<User> user = userRepository.findByEmail(email);
             String token = jwtTokenProvider.createToken(email, Collections.singletonList(user.get().getRoles()));
                  return token;
         }
@@ -77,7 +81,7 @@ public class UserService {
         userRepository.deleteByEmail(email);
     }
 
-    public Iterable<User> findAllUser() {
+    public List<User> findAllUser() {
         return userRepository.findAll();
     }
 
@@ -86,5 +90,10 @@ public class UserService {
     }
 
     public void updateUser(RegistrationRequest registrationRequest) {
+    }
+
+    public boolean findByUserId(long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        return user.get().isEmailVerified();
     }
 }

@@ -1,113 +1,38 @@
-package com.usermodule.registrationutil.dto;
+package com.usermodule.resetpasswordutil.dto;
 
 import com.usermodule.emailverificationutil.service.EmailSender;
-import com.usermodule.exceptionutil.CustomException;
-import com.usermodule.registrationutil.entity.token.ConfirmationToken;
-import com.usermodule.registrationutil.entity.user.User;
-import com.usermodule.registrationutil.repository.ConfirmationTokenRepository;
-import com.usermodule.registrationutil.service.ConfirmationTokenService;
 import com.usermodule.registrationutil.service.UserService;
-import com.usermodule.smsutil.service.SmsVerificationService;
-import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import com.usermodule.resetpasswordutil.service.PasswordResetTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Random;
-
 @Service
-@Slf4j
-public class VerificationResponse {
+public class ResetPasswordResponse {
+
+    @Value("${reset.password.verification.link}")
+    private String resetLink;
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PasswordResetTokenService passwordResetTokenService;
+
     @Autowired
     private EmailSender emailSender;
-    @Autowired
-    private ConfirmationTokenService confirmationTokenService;
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private SmsVerificationService smsVerificationService;
-    @Value("${email.verification.link}")
-    private String link;
 
-    @Autowired
-    private ConfirmationTokenRepository confirmationTokenRepository;
+    public void resetPassword(String email) {
+        String resetPasswordToken = passwordResetTokenService.createToken(email);
+        resetLink = resetLink+resetPasswordToken;
 
-    public void verifyByEmail(String email) {
-        Optional<User> byEmail = userService.findByEmail(email);
-        User user = byEmail.get();
-        verification(user);
-    }
-
-    public void verification(User userId) {
-        String token = confirmationTokenService.emailOrMobileVerification(userId);
-        link=link+token;
-        //log.info("Token -> ",token);
-        //for email verification
         emailSender.send(
-                userId.getEmail(),
-                buildEmail(userId.getFirstName(), link));
+                email,
+                buildResetEmail(userService.findByEmail(email).get().getFirstName(),resetLink)
+        );
+
     }
-
-    public void mobileVerification(String mobileNumber){
-
-//        //for mobile number verification
-        String otp=generateOtp(4);
-//        String message = "\n Hello "+registrationRequest.getFirstName()+ "Please click on below link to verify \n"+otp;
-//        smsVerificationService.sendSms(new SmsRequest(registrationRequest.getNumber(),message));
-    }
-
-    public String generateOtp(int len)
-    {
-        System.out.println("Generating OTP using random() : ");
-        System.out.print("You OTP is : ");
-
-        // Using numeric values
-        String numbers = "0123456789";
-
-        // Using random method
-        Random rndm_method = new Random();
-
-        char[] otp = new char[len];
-
-        for (int i = 0; i < len; i++)
-        {
-            // Use of charAt() method : to get character value
-            // Use of nextInt() as it is scanning the value as int
-            otp[i] =
-                    numbers.charAt(rndm_method.nextInt(numbers.length()));
-        }
-        return String.valueOf(otp);
-    }
-    public void confirmToken(String token) {
-
-        ConfirmationToken confirmationToken = confirmationTokenService.
-                getToken(token).
-                orElseThrow(
-                        () -> new CustomException("token not found", HttpStatus.UNAUTHORIZED)
-                );
-        if (confirmationToken.getConfirmedAt() != null) {
-            throw new CustomException("Email already confirmed", HttpStatus.GONE);
-        }
-        LocalDateTime expiredAt = confirmationToken.getExpiresAt();
-
-        if (expiredAt.isBefore(LocalDateTime.now())) {
-            throw new CustomException("Token Expired", HttpStatus.UNAUTHORIZED);
-        }
-        confirmationTokenService.setConfirmedAt(token);
-
-        userService.enableUser(
-                confirmationToken.getUser().getEmail());
-    }
-
-
-    private String buildEmail(String firstName, String link) {
+    private String buildResetEmail(String firstName, String link) {
 
         return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
                 "\n" +
@@ -164,7 +89,7 @@ public class VerificationResponse {
                 "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
                 "      <td style=\"font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1.315789474;max-width:560px\">\n" +
                 "        \n" +
-                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + firstName + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> Thank you for registering. Please click on the below link to activate your account: </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link + "\">Activate Now</a> </p></blockquote>\n Link will expire in 15 minutes. <p>See you soon</p>" +
+                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + firstName + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">  Please click on the below link to reset your account: </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link + "\">Activate Now</a> </p></blockquote>\n  <p>See you soon</p>" +
                 "        \n" +
                 "      </td>\n" +
                 "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
@@ -177,5 +102,5 @@ public class VerificationResponse {
                 "</div></div>";
     }
 
-}
 
+}

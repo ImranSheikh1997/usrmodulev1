@@ -6,6 +6,7 @@ import com.usermodule.fileutil.service.FileStorageService;
 import com.usermodule.registrationutil.dto.login.FileStorageResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Slf4j
 @RestController
@@ -38,7 +41,7 @@ public class ImageUploadController {
         String filename = fileStorageService.storeFile(file);
 
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/downloadFile/")
+                .path("/downloadimage/")
                 .path(filename)
                 .toUriString();
 
@@ -57,8 +60,30 @@ public class ImageUploadController {
         return new ResponseEntity<>(filename,HttpStatus.ACCEPTED);
     }
 
+    @GetMapping("/displayimage/{fileName:.+}")
+    public ResponseEntity<Resource> displayImage(
+            @PathVariable String fileName)  {
+
+        try {
+            Path imagePath = fileStorageService.loadFileAsPath(fileName);
+
+            if (imagePath != null) {
+                ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(imagePath));
+
+                return ResponseEntity
+                        .ok()
+                        .contentLength(imagePath.toFile().length())
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).build();
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
     //This Api is for Downloading file
-    @GetMapping("/multipart/downloadFile/{fileName:.+}")
+    @GetMapping("/downloadimage/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(
             @PathVariable String fileName,
             HttpServletRequest request){
