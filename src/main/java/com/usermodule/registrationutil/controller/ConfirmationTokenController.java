@@ -28,7 +28,7 @@ public class ConfirmationTokenController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    //This Api is used for send Email verification link
+    //This Api is used for otp verification
     @GetMapping("/sendotp/{number}")
     public ResponseEntity<?> verifyByMobileNumber(
             @PathVariable("number") String number
@@ -44,9 +44,7 @@ public class ConfirmationTokenController {
             @ApiParam("token")
             @PathVariable("token") String token){
 
-        verificationResponse.confirmToken(token);
-
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(verificationResponse.confirmToken(token),HttpStatus.ACCEPTED);
     }
 
 }

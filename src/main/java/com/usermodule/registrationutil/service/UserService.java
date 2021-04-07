@@ -68,9 +68,11 @@ public class UserService {
             if(!user.isPresent()) {
                 throw new CustomException("Invalid username supplied", HttpStatus.UNAUTHORIZED);
             }
-           authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-            String token = jwtTokenProvider.createToken(email, Collections.singletonList(user.get().getRoles()));
-                 return token;
+            else {
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+                String token = jwtTokenProvider.createToken(email, Collections.singletonList(user.get().getRoles()));
+                return token;
+            }
         }
         catch (AuthenticationException e) {
             throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
@@ -95,5 +97,10 @@ public class UserService {
     public boolean findByUserId(long userId) {
         Optional<User> user = userRepository.findById(userId);
         return user.get().isEmailVerified();
+    }
+
+    public void updatePassword(String email,String password) {
+
+        userRepository.updatePassword(email,password);
     }
 }

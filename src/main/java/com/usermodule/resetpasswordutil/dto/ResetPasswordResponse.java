@@ -1,11 +1,16 @@
 package com.usermodule.resetpasswordutil.dto;
 
 import com.usermodule.emailverificationutil.service.EmailSender;
+import com.usermodule.exceptionutil.CustomException;
 import com.usermodule.registrationutil.service.UserService;
 import com.usermodule.resetpasswordutil.service.PasswordResetTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class ResetPasswordResponse {
@@ -22,6 +27,9 @@ public class ResetPasswordResponse {
     @Autowired
     private EmailSender emailSender;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public void resetPassword(String email) {
         String resetPasswordToken = passwordResetTokenService.createToken(email);
         resetLink = resetLink+resetPasswordToken;
@@ -31,6 +39,12 @@ public class ResetPasswordResponse {
                 buildResetEmail(userService.findByEmail(email).get().getFirstName(),resetLink)
         );
 
+    }
+
+    public String updatePassword(String email, String password) {
+        password = passwordEncoder.encode(password);
+        userService.updatePassword(email,password);
+        return userService.signin(email,password);
     }
     private String buildResetEmail(String firstName, String link) {
 
@@ -102,5 +116,26 @@ public class ResetPasswordResponse {
                 "</div></div>";
     }
 
+
+    public String verifyToken(String token) {
+        PasswordResetToken passwordResetToken = passwordResetTokenService.
+                getToken(token).
+                orElseThrow(
+                        () -> new CustomException("token not found", HttpStatus.UNAUTHORIZED)
+                );
+
+        LocalDateTime expiredAt = passwordResetToken.getExpiresAt();
+
+        if (expiredAt.isBefore(LocalDateTime.now())) {
+            throw new CustomException("Token Expired", HttpStatus.UNAUTHORIZED);
+        }
+
+        String email = passwordResetToken.getUser().getEmail();
+
+        //Deleting Token as its nowhere use full
+        passwordResetTokenService.deleteToken(token);
+
+        return email;
+    }
 
 }

@@ -24,4 +24,10 @@ public interface UserRepository
 
     @Transactional
     void deleteByEmail(String email);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE User a" +
+            " SET a.password = ?2 WHERE a.email = ?1")
+    void updatePassword(String email, String password);
 }

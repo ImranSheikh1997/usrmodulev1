@@ -40,4 +40,11 @@ public class PasswordResetTokenService {
             throw new CustomException("Invalid Email ", HttpStatus.BAD_REQUEST);
         }
     }
+    public Optional<PasswordResetToken> getToken(String token) {
+        return passwordResetTokenRepository.findByToken(token);
+    }
+
+    public void deleteToken(String token) {
+        passwordResetTokenRepository.deleteByToken(token);
+    }
 }

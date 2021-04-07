@@ -85,7 +85,7 @@ public class VerificationResponse {
         }
         return String.valueOf(otp);
     }
-    public void confirmToken(String token) {
+    public String confirmToken(String token) {
 
         ConfirmationToken confirmationToken = confirmationTokenService.
                 getToken(token).
@@ -104,6 +104,9 @@ public class VerificationResponse {
 
         userService.enableUser(
                 confirmationToken.getUser().getEmail());
+
+        //For Auto Login. Directly singing in user.
+        return userService.signin(confirmationToken.getUser().getEmail(),confirmationToken.getUser().getPassword());
     }
 
 

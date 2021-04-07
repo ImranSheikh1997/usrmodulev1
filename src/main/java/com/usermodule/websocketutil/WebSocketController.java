@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
 
 @RestController
 public class WebSocketController {
@@ -16,12 +17,10 @@ public class WebSocketController {
 
     @MessageMapping("/hello")
     @SendTo("/topic/greetings")
-    public boolean checkUserVerified(
-            //@PathVariable long userId)
-    )throws Exception{
+    public String checkUserVerified(String userId)
+    throws Exception{
         Thread.sleep(3000); //will send response in interval of every 3 seconds
-        //boolean isVerified = webSocketResponse.checkIsEmailVerified(userId);
-        //return isVerified;
-        return true;
+        boolean isVerified = webSocketResponse.checkIsEmailVerified(Long.parseLong(userId));
+        return HtmlUtils.htmlEscape(Boolean.toString(isVerified));
     }
 }
