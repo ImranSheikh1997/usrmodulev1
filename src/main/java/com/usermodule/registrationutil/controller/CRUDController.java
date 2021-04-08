@@ -1,7 +1,7 @@
 package com.usermodule.registrationutil.controller;
 
+import com.usermodule.registrationutil.displayuserDTO.DisplayUserRequest;
 import com.usermodule.registrationutil.dto.UpdateRequest;
-import com.usermodule.registrationutil.dto.registration.RegistrationRequest;
 import com.usermodule.registrationutil.service.DisplayFindAllUserRequest;
 import com.usermodule.registrationutil.service.DisplayUserService;
 import com.usermodule.registrationutil.service.UserService;
@@ -59,14 +59,13 @@ public class CRUDController {
         return new ResponseEntity<>(displayUserService.get_UserProfile(email),HttpStatus.OK);
     }
 
-    @PutMapping("/updateuser/{email}")
+    @PutMapping("/updateuser")
     public ResponseEntity<?> updateUser(
-            @PathVariable("email") String email,
-            @RequestBody(required = false)
-                    RegistrationRequest registrationRequest
+            @RequestBody
+            DisplayUserRequest displayUserRequest
     )
     {
-        updateRequest.updateUser(email,registrationRequest);
+        updateRequest.updateUser(displayUserRequest);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

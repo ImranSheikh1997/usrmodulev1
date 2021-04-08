@@ -2,7 +2,7 @@ package com.usermodule.registrationutil.service;
 
 import com.usermodule.exceptionutil.CustomException;
 import com.usermodule.jwtutil.JwtTokenProvider;
-import com.usermodule.registrationutil.dto.registration.RegistrationRequest;
+import com.usermodule.registrationutil.displayuserDTO.DisplayUserRequest;
 import com.usermodule.registrationutil.entity.user.User;
 import com.usermodule.registrationutil.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -68,14 +68,17 @@ public class UserService {
             if(!user.isPresent()) {
                 throw new CustomException("Invalid username supplied", HttpStatus.UNAUTHORIZED);
             }
-            else {
+            else if(user.get().isEmailVerified()){
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
                 String token = jwtTokenProvider.createToken(email, Collections.singletonList(user.get().getRoles()));
                 return token;
             }
+            else{
+                throw new CustomException("User is not verified yet",HttpStatus.UNAUTHORIZED);
+            }
         }
         catch (AuthenticationException e) {
-            throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("Invalid username/password supplied", HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -91,7 +94,16 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public void updateUser(RegistrationRequest registrationRequest) {
+    public void updateUser(DisplayUserRequest displayUserRequest) {
+        userRepository.updateUserByEmail(displayUserRequest.getEmail(),
+                displayUserRequest.getCity(),
+                displayUserRequest.getCountry(),
+                displayUserRequest.getFirstName(),
+                displayUserRequest.getLastName(),
+                displayUserRequest.getGender(),
+                displayUserRequest.getNumber(),
+                displayUserRequest.getState()
+        );
     }
 
     public boolean findByUserId(long userId) {

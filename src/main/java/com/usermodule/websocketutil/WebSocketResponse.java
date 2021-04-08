@@ -9,7 +9,8 @@ public class WebSocketResponse {
     @Autowired
     private UserService userService;
 
-    public boolean checkIsEmailVerified(long userId) {
-        return userService.findByUserId(userId);
+    public String checkIsEmailVerified(long userId) {
+
+         return String.valueOf(userService.findByUserId(userId));
     }
 }

@@ -3,6 +3,7 @@ package com.usermodule.registrationutil.controller;
 import com.usermodule.registrationutil.dto.login.FileStorageResponse;
 import com.usermodule.registrationutil.dto.registration.RegistrationRequest;
 import com.usermodule.registrationutil.dto.registration.RegistrationResponse;
+import com.usermodule.registrationutil.entity.user.User;
 import com.usermodule.registrationutil.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -12,7 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 
 @Slf4j
 @RestController
@@ -30,21 +33,37 @@ public class RegistrationController {
     @Autowired
     private FileStorageResponse fileStorageResponse;
 
+    @Autowired
+    private SimpMessageSendingOperations messagingTemplate;
+
     //This Api is for Registration Form
     @PostMapping("/registration")
     @ApiResponses(value={//
-            @ApiResponse(code = 400, message = "Something went wrong"), //
+            @ApiResponse(code = 500, message = "Something went wrong"), //
             @ApiResponse(code = 403, message = "Access Denied"),//
             @ApiResponse(code = 422, message = "Username is already in use")})
-    public ResponseEntity<?> register(
+    public void register(
             @ApiParam("Sign up user")
             @RequestBody(required = false) RegistrationRequest registrationRequest){
 
         registrationRequest.setFilename( fileStorageResponse.convertToMultipart(registrationRequest.getAvatar()));
 
-        registrationResponse.register(registrationRequest);
+        User user = registrationResponse.register(registrationRequest);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            Thread.sleep(3000);
+            if(user.isEmailVerified()){
+                String value = String.valueOf(user.isEmailVerified());
+                value = value + "=" + userService.signin(registrationRequest.getEmail(),registrationRequest.getPassword());
+                messagingTemplate.convertAndSendToUser(HtmlUtils.htmlEscape(registrationRequest.getEmail()), "/queue/notification", value);
+            }
+            else{
+                messagingTemplate.convertAndSendToUser(HtmlUtils.htmlEscape(registrationRequest.getEmail()), "/queue/notification", user.isEmailVerified());
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     //Api to check whether email is available or not

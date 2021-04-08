@@ -44,7 +44,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role roles;
 
-    //@Pattern(regexp="(^$|[0-9]{10})")
+//    @Pattern(regexp="(^$|[0-9]{10})")
     @Column(unique = true)
     private String number;
 

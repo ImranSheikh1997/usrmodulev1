@@ -3,7 +3,6 @@ package com.usermodule.registrationutil.dto.registration;
 import com.usermodule.registrationutil.dto.VerificationResponse;
 import com.usermodule.registrationutil.entity.user.User;
 import com.usermodule.registrationutil.model.enums.Role;
-import com.usermodule.registrationutil.repository.ConfirmationTokenRepository;
 import com.usermodule.registrationutil.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -24,17 +23,14 @@ public class RegistrationResponse {
     @Autowired
     private VerificationResponse verificationResponse;
 
-    @Autowired
-    private ConfirmationTokenRepository confirmationTokenRepository;
-
     //for saving user to the db.
-    public void register(RegistrationRequest registrationRequest) {
+    public User register(RegistrationRequest registrationRequest) {
 
         Role roles = Role.valueOf("ROLE_USER");
         registrationRequest.setRole(roles);
         registrationRequest.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
 
-        User userId = userService.signUpUser(
+        User user = userService.signUpUser(
                 new User(
                         registrationRequest.getEmail(),
                         registrationRequest.getPassword(),
@@ -51,6 +47,9 @@ public class RegistrationResponse {
                         registrationRequest.getCity()
                 )
         );
+        String email = user.getEmail();
+        verificationResponse.verification(user);
+        return user;
     }
 
 }

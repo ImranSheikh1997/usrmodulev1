@@ -41,13 +41,20 @@ public class VerificationResponse {
 
     public void verifyByEmail(String email) {
         Optional<User> byEmail = userService.findByEmail(email);
-        User user = byEmail.get();
-        verification(user);
+        if(byEmail.isPresent()) {
+            User user = byEmail.get();
+            verification(user);
+        }
+        else
+        {
+            throw new CustomException("Invalid Email Id",HttpStatus.BAD_REQUEST);
+        }
     }
 
     public void verification(User userId) {
         String token = confirmationTokenService.emailOrMobileVerification(userId);
-        link=link+token;
+        link=link+"token-"+token;
+        log.info("link");
         //log.info("Token -> ",token);
         //for email verification
         emailSender.send(

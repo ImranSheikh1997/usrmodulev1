@@ -1,5 +1,7 @@
 package com.usermodule.fileutil.config;
 
+import com.usermodule.exceptionutil.CustomException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 import sun.misc.BASE64Decoder;
 
@@ -82,8 +84,7 @@ public class BASE64DecodedMultipartFile implements MultipartFile {
 
             return new BASE64DecodedMultipartFile(b, baseStrs[0]);
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+          throw new CustomException("Interval server error! while uploading Image", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

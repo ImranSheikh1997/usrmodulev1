@@ -1,11 +1,12 @@
 package com.usermodule.registrationutil.displayuserDTO;
 
 import com.usermodule.registrationutil.model.enums.Gender;
-import com.usermodule.registrationutil.model.enums.Title;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.validation.constraints.Pattern;
 
 /**
  *
@@ -16,13 +17,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class DisplayUserRequest {
     private String email;
+    private String city;
+    private String country;
     private String firstName;
     private String lastName;
     private Gender gender;
-    private Title title;
+    @Pattern(regexp="(^$|[0-9]{10})")
     private String number;
-    private String filename;
-    private String country;
     private String state;
-    private String city;
+
 }

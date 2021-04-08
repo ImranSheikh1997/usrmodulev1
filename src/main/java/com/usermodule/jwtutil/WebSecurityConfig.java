@@ -69,6 +69,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/","/public").permitAll()
                 .antMatchers("/topic","/greetings").permitAll()
                 .antMatchers("/hello").permitAll()
+                .antMatchers("/home").permitAll()
                 .antMatchers("/websocket","/blog","/**","/**","/websocket").permitAll()
                 //Disallow everything else...
                 .anyRequest().authenticated();
