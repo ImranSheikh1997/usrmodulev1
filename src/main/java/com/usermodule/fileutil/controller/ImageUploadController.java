@@ -63,7 +63,6 @@ public class ImageUploadController {
     @GetMapping("/displayimage/{fileName:.+}")
     public ResponseEntity<Resource> displayImage(
             @PathVariable String fileName)  {
-
         try {
             Path imagePath = fileStorageService.loadFileAsPath(fileName);
 

@@ -5,10 +5,7 @@ import com.usermodule.registrationutil.dto.registration.RegistrationRequest;
 import com.usermodule.registrationutil.dto.registration.RegistrationResponse;
 import com.usermodule.registrationutil.entity.user.User;
 import com.usermodule.registrationutil.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,10 +33,11 @@ public class RegistrationController {
     @Autowired
     private SimpMessageSendingOperations messagingTemplate;
 
-    //This Api is for Registration Form
+    //Registration form api
     @PostMapping("/registration")
+    @ApiOperation(value = "${UserController.signin}")
     @ApiResponses(value={//
-            @ApiResponse(code = 500, message = "Something went wrong"), //
+            @ApiResponse(code = 500, message = "Interval server error! while uploading Image"), //
             @ApiResponse(code = 403, message = "Access Denied"),//
             @ApiResponse(code = 422, message = "Username is already in use")})
     public void register(
@@ -50,15 +48,17 @@ public class RegistrationController {
 
         User user = registrationResponse.register(registrationRequest);
 
+        String value = String.valueOf(user.isEmailVerified());
         try {
             Thread.sleep(3000);
             if(user.isEmailVerified()){
-                String value = String.valueOf(user.isEmailVerified());
+                log.info("true");
                 value = value + "=" + userService.signin(registrationRequest.getEmail(),registrationRequest.getPassword());
                 messagingTemplate.convertAndSendToUser(HtmlUtils.htmlEscape(registrationRequest.getEmail()), "/queue/notification", value);
             }
             else{
-                messagingTemplate.convertAndSendToUser(HtmlUtils.htmlEscape(registrationRequest.getEmail()), "/queue/notification", user.isEmailVerified());
+                log.info("false");
+                messagingTemplate.convertAndSendToUser(HtmlUtils.htmlEscape(registrationRequest.getEmail()), "/queue/notification", value);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

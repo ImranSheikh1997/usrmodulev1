@@ -8,6 +8,7 @@ import com.usermodule.registrationutil.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -35,6 +36,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ConfirmationTokenService confirmationTokenService;
 
     public User signUpUser(User user) {
         checkEmail(user.getEmail());
@@ -82,8 +86,10 @@ public class UserService {
         }
     }
 
-    public void delete(String email) {
+    public ResponseEntity<?> delete(String email) {
+        confirmationTokenService.deleteTokenByUser(userRepository.findByEmail(email).get());
         userRepository.deleteByEmail(email);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     public List<User> findAllUser() {

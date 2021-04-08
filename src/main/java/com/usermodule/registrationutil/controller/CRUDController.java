@@ -35,12 +35,12 @@ public class CRUDController {
             @ApiResponse(code = 404, message = "The user doesn't exist"),//
             @ApiResponse(code=500, message = "Expired or invalid token")
     })
-    public String delete(
+    public ResponseEntity<?> delete(
             @ApiParam("email")
-            @PathVariable String email){
+            @PathVariable("email") String email){
 
         userService.delete(email);
-        return email;
+        return new ResponseEntity<>("ok",HttpStatus.OK);
     }
 
     @GetMapping("/findalluser")

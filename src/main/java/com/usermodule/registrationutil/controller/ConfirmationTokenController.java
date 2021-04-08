@@ -1,6 +1,7 @@
 package com.usermodule.registrationutil.controller;
 
 import com.usermodule.registrationutil.dto.VerificationResponse;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
+@Api(tags = "Email verification Controller")
 @CrossOrigin("*")
 public class ConfirmationTokenController {
     @Autowired

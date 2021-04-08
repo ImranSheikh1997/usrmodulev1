@@ -53,8 +53,8 @@ public class VerificationResponse {
 
     public void verification(User userId) {
         String token = confirmationTokenService.emailOrMobileVerification(userId);
-        link=link+"token-"+token;
-        log.info("link");
+        link=link+"token?"+token;
+        log.info("link", link);
         //log.info("Token -> ",token);
         //for email verification
         emailSender.send(
@@ -97,7 +97,7 @@ public class VerificationResponse {
         ConfirmationToken confirmationToken = confirmationTokenService.
                 getToken(token).
                 orElseThrow(
-                        () -> new CustomException("token not found", HttpStatus.UNAUTHORIZED)
+                        () -> new CustomException("token not Matched", HttpStatus.UNAUTHORIZED)
                 );
         if (confirmationToken.getConfirmedAt() != null) {
             throw new CustomException("Email already confirmed", HttpStatus.GONE);

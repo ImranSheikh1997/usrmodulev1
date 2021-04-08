@@ -42,4 +42,8 @@ public class ConfirmationTokenService {
     public String findConfirmationTokenByUser(User user) {
         return findConfirmationTokenByUser(user);
     }
+
+    public void deleteTokenByUser(User user) {
+        confirmationTokenRepository.deleteByUser(user);
+    }
 }

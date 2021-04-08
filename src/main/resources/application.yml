@@ -59,5 +59,11 @@ spring:
       max-file-size: 30MB
       max-request-size: 50MB
 
-
 support.email: is463856@gmail.com
+
+UserController:
+  signin: Authenticates(email, password(Bcrypt)) user, check is email verified and returns its JWT token.
+  signup: Creates user and returns its JWT token
+  delete: Deletes specific user by username
+  search: Returns specific user by username
+  me: Returns current user's data
