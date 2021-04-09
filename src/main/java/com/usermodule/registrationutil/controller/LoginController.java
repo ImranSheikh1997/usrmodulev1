@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 @RestController
 @Slf4j
 @RequestMapping("/usermodule")
@@ -34,7 +36,14 @@ public class LoginController {
     @PostMapping("/signin")
     public ResponseEntity<?> login(
             @RequestBody LogInRequest logInRequest) {
-        return new ResponseEntity<>(logInResponse.login(logInRequest), HttpStatus.ACCEPTED);
+        String jwt = logInResponse.login(logInRequest);
+        String email = userService.findByEmail(logInRequest.getEmail()).get().getEmail();
+
+        HashMap<String, String> map = new HashMap<>();
+        map.put("jwt", jwt);
+        map.put("email", email);
+
+        return new ResponseEntity<>(map, HttpStatus.ACCEPTED);
     }
 
 }

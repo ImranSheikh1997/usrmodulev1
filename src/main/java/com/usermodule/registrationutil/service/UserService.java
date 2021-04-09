@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -121,4 +122,27 @@ public class UserService {
 
         userRepository.updatePassword(email,password);
     }
+
+    public String autologin(String email) {
+        Optional<User> user = findByEmail(email);
+        try {
+                String token = jwtTokenProvider.createToken(email, Collections.singletonList(user.get().getRoles()));
+                return token;
+        }
+        catch(AuthenticationException e) {
+            throw new CustomException("Invalid username/password supplied", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @Async
+    public boolean isEmailVerified(String email) {
+        if(findByEmail(email).get().isEmailVerified()){
+            return findByEmail(email).get().isEmailVerified();
+        }
+        else{
+            isEmailVerified(email);
+        }
+        return false;
+    }
 }
+

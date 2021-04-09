@@ -47,7 +47,6 @@ public class RegistrationResponse {
                         registrationRequest.getCity()
                 )
         );
-        String email = user.getEmail();
         verificationResponse.verification(user);
         return user;
     }

@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -35,6 +36,8 @@ public class VerificationResponse {
     private SmsVerificationService smsVerificationService;
     @Value("${email.verification.link}")
     private String link;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private ConfirmationTokenRepository confirmationTokenRepository;
@@ -52,14 +55,10 @@ public class VerificationResponse {
     }
 
     public void verification(User userId) {
-        String token = confirmationTokenService.emailOrMobileVerification(userId);
-        link=link+"token?"+token;
-        log.info("link", link);
-        //log.info("Token -> ",token);
         //for email verification
         emailSender.send(
                 userId.getEmail(),
-                buildEmail(userId.getFirstName(), link));
+                buildEmail(userId.getFirstName(), link+confirmationTokenService.emailOrMobileVerification(userId)));
     }
 
     public void mobileVerification(String mobileNumber){
@@ -99,25 +98,29 @@ public class VerificationResponse {
                 orElseThrow(
                         () -> new CustomException("token not Matched", HttpStatus.UNAUTHORIZED)
                 );
-        if (confirmationToken.getConfirmedAt() != null) {
-            throw new CustomException("Email already confirmed", HttpStatus.GONE);
-        }
+
+        log.info("token {} ",confirmationToken.getToken());
         LocalDateTime expiredAt = confirmationToken.getExpiresAt();
+        log.info("confirmed at value {} ",confirmationToken.getConfirmedAt());
+        if (confirmationToken.getConfirmedAt() != null)
+            throw new CustomException("Email already confirmed", HttpStatus.GONE);
 
-        if (expiredAt.isBefore(LocalDateTime.now())) {
+        if (expiredAt.isBefore(LocalDateTime.now()))
             throw new CustomException("Token Expired", HttpStatus.UNAUTHORIZED);
+
+        else {
+            confirmationTokenService.setConfirmedAt(token);
+
+            userService.enableUser(
+                    confirmationToken.getUser().getEmail());
+
+            //For Auto Login. Directly singing in user.
+            return userService.autologin(confirmationToken.getUser().getEmail());
         }
-        confirmationTokenService.setConfirmedAt(token);
-
-        userService.enableUser(
-                confirmationToken.getUser().getEmail());
-
-        //For Auto Login. Directly singing in user.
-        return userService.signin(confirmationToken.getUser().getEmail(),confirmationToken.getUser().getPassword());
     }
 
 
-    private String buildEmail(String firstName, String link) {
+    private String buildEmail(String firstName, String link1) {
 
         return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
                 "\n" +
@@ -174,7 +177,7 @@ public class VerificationResponse {
                 "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
                 "      <td style=\"font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1.315789474;max-width:560px\">\n" +
                 "        \n" +
-                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + firstName + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> Thank you for registering. Please click on the below link to activate your account: </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link + "\">Activate Now</a> </p></blockquote>\n Link will expire in 15 minutes. <p>See you soon</p>" +
+                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + firstName + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> Thank you for registering. Please click on the below link to activate your account: </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link1 + "\">Activate Now</a> </p></blockquote>\n Link will expire in 15 minutes. <p>See you soon</p>" +
                 "        \n" +
                 "      </td>\n" +
                 "      <td width=\"10\" valign=\"middle\"><br></td>\n" +

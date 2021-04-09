@@ -28,6 +28,11 @@ public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationT
     void updateConfirmedAt(String token,
                            LocalDateTime  confirmedAt);
 
+    @Query(
+            "SELECT user FROM ConfirmationToken where token=?1"
+    )
+    User findUserByToken(String token);
+
     @Transactional
     @Modifying
     @Query(
@@ -35,4 +40,6 @@ public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationT
                     " where c.user = ?1"
     )
     void deleteByUser(User user);
+
+
 }

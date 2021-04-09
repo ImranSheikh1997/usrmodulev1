@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.HtmlUtils;
 
 @Slf4j
 @RestController
@@ -48,25 +47,23 @@ public class RegistrationController {
 
         User user = registrationResponse.register(registrationRequest);
 
-        String value = String.valueOf(user.isEmailVerified());
-        try {
-            Thread.sleep(3000);
-            if(user.isEmailVerified()){
-                log.info("true");
-                value = value + "=" + userService.signin(registrationRequest.getEmail(),registrationRequest.getPassword());
-                messagingTemplate.convertAndSendToUser(HtmlUtils.htmlEscape(registrationRequest.getEmail()), "/queue/notification", value);
-            }
-            else{
-                log.info("false");
-                messagingTemplate.convertAndSendToUser(HtmlUtils.htmlEscape(registrationRequest.getEmail()), "/queue/notification", value);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        String jwt;
 
+//        do {
+//            try {
+//                Thread.sleep(3000);
+//                if (user.isEmailVerified()) {
+//                    jwt = userService.autologin(user.getEmail());
+//                    messagingTemplate.convertAndSendToUser(HtmlUtils.htmlEscape(user.getEmail()), "/queue/notification", jwt);
+//                }
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        } while (user.isEmailVerified());
     }
 
-    //Api to check whether email is available or not
+
+    //Api to check whether email is unique
     @GetMapping("/checkemail/{email}")
     @ApiResponses(value={//
             @ApiResponse(code = 400, message = "Something went wrong"), //
